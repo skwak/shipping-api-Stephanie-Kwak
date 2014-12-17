@@ -1,4 +1,16 @@
 source 'https://rubygems.org'
+group :development do
+  gem "better_errors"
+  gem "binding_of_caller"
+end
+
+group :development, :test do
+  gem 'rspec-rails', '~> 3.0.0'
+end
+
+gem 'dotenv-rails', :groups => [:development, :test]
+
+gem 'rails_12factor', group: :production
 
 gem 'active_shipping'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
