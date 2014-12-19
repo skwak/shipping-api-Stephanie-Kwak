@@ -3,7 +3,7 @@ class QuotesController < ApplicationController
   include ActiveMerchant::Shipping
 
   def search
-    
+
     @package = Package.new(12,
                           [93,10],
                           :cylinder => false
@@ -28,6 +28,16 @@ class QuotesController < ApplicationController
       response = ups.find_rates(@origin, @destination, @package)
       ups_rates = response.rates.sort_by(&:price).collect {|rate| [rate.service_name, rate.price]}
       render json: ups_rates
+    elsif @carrier == "USPS"
+      usps = USPS.new(:login => ENV["USPS_USERNAME"])
+      response = usps.find_rates(@origin, @destination, @package)
+      usps_rates = response.rates.sort_by(&:price).collect {|rate| [rate.service_name, rate.price]}
+      render json: usps_rates
+    elsif @carrier == "FEDEX"
+      fedex = FedEx.new(:login => ENV["FEDEX_LOGIN"], :password => ENV["FEDEX_PASSWORD"], key: ENV["FEDEX_KEY"], account: ENV["FEDEX_ACCOUNT"], :test => true)
+      response = fedex.find_rates(@origin, @destination, @package)
+      fedex_rates = response.rates.sort_by(&:price).collect {|rate| [rate.service_name, rate.price]}
+      render json: fedex_rates
     end
 
     # http://localhost:3000/quotes/search?origincountry=US&originstate=WA&origincity=Seattle&originzip=98121&country=US&state=MD&city=Baltimore&zip=21231&carrier=UPS
@@ -45,7 +55,7 @@ class QuotesController < ApplicationController
     # :province => 'ON',
     # :city => 'Ottawa',
     # :postal_code => 'K1P 1J1')
-    #
+
 
     # usps = USPS.new(:login => ENV["USPS_USERNAME"])
     # response = usps.find_rates(@origin, @destination, @package)
