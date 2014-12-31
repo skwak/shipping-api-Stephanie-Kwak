@@ -1,6 +1,7 @@
 class QuotesController < ApplicationController
   # require 'active_shipping'
   include ActiveMerchant::Shipping
+  before_filter :audit
 
   def search
 
@@ -69,4 +70,11 @@ class QuotesController < ApplicationController
     # render json: tracking_info
 
   end
+
+  private
+
+  def audit
+    # record the action and parameters in an audit log
+  end
+  
 end
