@@ -2,8 +2,11 @@ class QuotesController < ApplicationController
   # require 'active_shipping'
   include ActiveMerchant::Shipping
   before_filter :audit
+  respond_to :json
 
   def search
+    @log = Log.new(params: params.to_json, url: @request)
+    @log.save
 
     @package = Package.new(12,
                           [93,10],
@@ -41,41 +44,15 @@ class QuotesController < ApplicationController
       render json: fedex_rates
     end
 
-    # http://localhost:3000/quotes/search?origincountry=US&originstate=WA&origincity=Seattle&originzip=98121&country=US&state=MD&city=Baltimore&zip=21231&carrier=UPS
-
-    # @package = Package.new(  100,                        # 100 grams
-    #   [93,10],                    # 93 cm long, 10 cm diameter
-    #   :cylinder => true)         # cylinders have different volume calculations
-    #
-    # @origin = Location.new(      :country => 'US',
-    # :state => 'CA',
-    # :city => 'Beverly Hills',
-    # :zip => '90210')
-    #
-    # @destination = Location.new( :country => 'CA',
-    # :province => 'ON',
-    # :city => 'Ottawa',
-    # :postal_code => 'K1P 1J1')
-
-
-    # usps = USPS.new(:login => ENV["USPS_USERNAME"])
-    # response = usps.find_rates(@origin, @destination, @package)
-    # render json: response
-
-    # fedex = FedEx.new(:login => ENV["FEDEX_LOGIN"], :password => ENV["FEDEX_PASSWORD"], key: ENV["FEDEX_KEY"], account: ENV["FEDEX_ACCOUNT"], :test => true)
-    # tracking_info = fedex.find_tracking_info('111111111111', :carrier_code => 'fedex_ground') # Ground package
-    # tracking_info.shipment_events.each do |event|
-    #   puts "#{event.name} at #{event.location.city}, #{event.location.state} on #{event.time}. #{event.message}"
-    # end
-    # render json: tracking_info
-
   end
 
   private
 
   def audit
-    # @request = logger.info(params.inspect).to_json
-    @log = Log.new(params: params.to_json)
+    # logfile = File.open('log/development.log', 'r')
+    @request = Rails.logger.info(request.env)
+    @ip = Rails.logger.info(request.env["HTTP_X_REAL_IP"])
+    @log = Log.new(params: params.to_json, url: @request, IP: @ip)
     @log.save
   end
 
