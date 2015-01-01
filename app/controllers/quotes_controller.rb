@@ -74,8 +74,8 @@ class QuotesController < ApplicationController
   private
 
   def audit
-    @request = Rails.logger.info("#{params.inspect}").to_json
-    @log = Log.new(params: @request)
+    # @request = logger.info(params.inspect).to_json
+    @log = Log.new(params: params.to_json)
     @log.save
   end
 
