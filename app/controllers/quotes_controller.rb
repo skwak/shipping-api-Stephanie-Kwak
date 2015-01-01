@@ -51,8 +51,8 @@ class QuotesController < ApplicationController
   def audit
     # logfile = File.open('log/development.log', 'r')
     @request = request.env["REQUEST_URI"]
-    # @ip = request.env["HTTP_X_REAL_IP"]
-    @log = Log.new(params: params.to_json, url: @request)
+    @ip = request.env["REMOTE_HOST"]
+    @log = Log.new(params: params.to_json, url: @request, IP: @ip)
     @log.save
   end
 
