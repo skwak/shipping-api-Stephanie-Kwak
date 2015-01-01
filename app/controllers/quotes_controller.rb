@@ -74,7 +74,9 @@ class QuotesController < ApplicationController
   private
 
   def audit
-    # record the action and parameters in an audit log
+    @request = Rails.logger.info("#{params.inspect}").to_json
+    @log = Log.new(params: @request)
+    @log.save
   end
-  
+
 end
